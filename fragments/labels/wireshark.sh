@@ -2,12 +2,10 @@ wireshark)
     name="Wireshark"
     type="dmg"
     if [[ $(arch) == i386 ]]; then
-      sparkleFeedURL="https://www.wireshark.org/update/0/Wireshark/4.0.0/macOS/x86-64/en-US/stable.xml"
+      downloadURL=$(curl -fs 'https://www.wireshark.org/download.html' |  xmllint --html --xpath '(//details[1]//a[contains(text(), "macOS Intel Disk Image")]/@href)[1]' - 2>/dev/null |  sed -n 's/.*href="\([^"]*\).*/\1/p')
     elif [[ $(arch) == arm64 ]]; then
-      sparkleFeedURL="https://www.wireshark.org/update/0/Wireshark/4.0.0/macOS/arm64/en-US/stable.xml"
+      downloadURL=$(curl -fs 'https://www.wireshark.org/download.html' |  xmllint --html --xpath '(//details[1]//a[contains(text(), "macOS Arm Disk Image")]/@href)[1]' - 2>/dev/null |  sed -n 's/.*href="\([^"]*\).*/\1/p')
     fi
-    sparkleFeed=$(curl -fs "$sparkleFeedURL")
-    appNewVersion=$(echo "$sparkleFeed" | xpath '(//rss/channel/item/enclosure/@sparkle:version)[1]' 2>/dev/null | cut -d '"' -f 2)
-    downloadURL=$(echo "$sparkleFeed" | xpath '(//rss/channel/item/enclosure/@url)[1]' 2>/dev/null | cut -d '"' -f 2)
+    appNewVersion=$(curl -fs 'https://www.wireshark.org/download.html' | grep -oE 'Stable Release: \d(\.\d)+' | grep -oE '\d(\.\d)+' | head -n 1)
     expectedTeamID="7Z6EMTD2C6"
     ;;
